@@ -48,12 +48,8 @@ $( function () {
 		let itemText = $(this).closest('li').find('.shopping-item');
 		// Toggle whether the text is struck through or not
 		itemText.toggleClass('shopping-item__checked');
-		// Toggle the text on the button to check/uncheck depending on it's state.
-		if ( itemText.attr('class').split(/\s+/).includes('shopping-item__checked') )
-			$(this).find('.button-label').text('uncheck');
-		else
-			$(this).find('.button-label').text('check');
-
+		// Set the text on the check button based on the item's state
+		resetCheck(itemText);
 	})
 })
 
@@ -65,3 +61,20 @@ $( function () {
 		 $(this).closest('li').remove();
 	})
 })
+
+/**
+ * Toggle the text on the button to check/uncheck depending on it's state.
+ */
+function resetCheck( items=[] ) {
+	if ( items.length === 0 )
+		items = $('.shopping-list').find('.shopping-item');
+	$(items).each( function( item ) {
+		console.log( $(this).attr('class'));
+		if ( $(this).attr('class').split(/\s+/).includes('shopping-item__checked') )
+			$(this).closest('li').find('.shopping-item-toggle .button-label').text('uncheck');
+		else
+			$(this).closest('li').find('.shopping-item-toggle .button-label').text('check');
+	});
+}
+
+resetCheck();
