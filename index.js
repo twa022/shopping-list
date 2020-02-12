@@ -49,11 +49,19 @@ $( function () {
 		// Toggle whether the text is struck through or not
 		itemText.toggleClass('shopping-item__checked');
 		// Toggle the text on the button to check/uncheck depending on it's state.
-		if ( itemText.attr('class').split(/\s+/).includes('shopping-item__checked') ) {
+		if ( itemText.attr('class').split(/\s+/).includes('shopping-item__checked') )
 			$(this).find('.button-label').text('uncheck');
-		} else {
+		else
 			$(this).find('.button-label').text('check');
-		}
 
+	})
+})
+
+$( function () {
+	// Create listener on the delete buttons
+	$('.shopping-list').on('click', 'button[class="shopping-item-delete"]', function( event ) {
+		event.stopPropagation();
+		 // Each shopping list item is a <li>. Go up the DOM tree to the <li> element, and remove it 
+		 $(this).closest('li').remove();
 	})
 })
