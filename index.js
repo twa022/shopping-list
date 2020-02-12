@@ -1,6 +1,10 @@
 function addToList( item, listItems=[] ) {
 	// Don't add empty items or items that are already on the list (if we pass a list to check against...)
-	if ( item.length <= 0 || listItems.includes(item) ) {
+	if ( item.length <= 0 ) {
+		// Probably don't need a message here...
+		return;
+	} 
+	if ( listItems.includes(item) ) {
 		/* maybe do something like display a message: item is already on the list */
 		return;
 	}
