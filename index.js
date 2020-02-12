@@ -19,7 +19,7 @@ function addToList( item, listItems=[] ) {
 					<span class="button-label">delete</span>
 				</button>
 			</div>
-		</li>`)
+		</li>`);
 }
 
 $( function() {
@@ -36,5 +36,24 @@ $( function() {
 		addToList( item );
 		// Reset the field so it doesn't still contain the text of what we just added
 		inputField.val('');
+	})
+})
+
+$( function () {
+	// Create listener on the check buttons
+	$('.shopping-list').on('click', 'button[class="shopping-item-toggle"]',  function( event ) {
+		event.stopPropagation();
+		 // Each shopping list item is a <li>. Go up the DOM tree to the <li> element, 
+		 // then back down to find the item text itself.
+		let itemText = $(this).closest('li').find('.shopping-item');
+		// Toggle whether the text is struck through or not
+		itemText.toggleClass('shopping-item__checked');
+		// Toggle the text on the button to check/uncheck depending on it's state.
+		if ( itemText.attr('class').split(/\s+/).includes('shopping-item__checked') ) {
+			$(this).find('.button-label').text('uncheck');
+		} else {
+			$(this).find('.button-label').text('check');
+		}
+
 	})
 })
