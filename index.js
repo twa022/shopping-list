@@ -22,6 +22,28 @@ function addToList( item, listItems=[] ) {
 		</li>`);
 }
 
+function isOnList( item ) {
+	item = item.toLowerCase();
+	// Get the items already on the list
+	const list = [];
+	$('.shopping-list').find('.shopping-item').each(function(idx, elem) {
+		list.push($(elem).text().toLowerCase());
+	})
+	console.log(list);
+	return list.map((i) => i.toLowerCase()).includes( item );
+}
+
+function unCheck( item ) {
+	item = item.trim().toLowerCase();
+	let match = $('.shopping-list').find('.shopping-item').filter(function(idx,elem) {
+		return $(elem).text().toLowerCase() === item;
+	});
+	if ( match.length === 0 )
+		return;
+	$(match).removeClass('shopping-item__checked');
+	resetCheck(match);
+}
+
 $( function() {
 	// Create listener on the form used to add new items to the list:
 	$('#js-shopping-list-form').submit( function(event) {
@@ -33,7 +55,12 @@ $( function() {
 		let item = inputField.val().trim();
 		console.log(item);
 		// Add it to the list
-		addToList( item );
+		if ( !isOnList( item ) ) {
+			addToList( item );
+		} else {
+			unCheck( item );
+			// Some indication that it was already on the list??
+		}
 		// Reset the field so it doesn't still contain the text of what we just added
 		inputField.val('');
 	})
