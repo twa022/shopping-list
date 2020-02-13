@@ -21,8 +21,8 @@ function addToList( item ) {
 		}
 	// Otherwise, the item isn't on the list, so add it
 	} else {
-		$('.shopping-list').append(`
-			<li>
+		let checkedItems = getCheckedItems();
+		let html = `<li>
 				<span class="shopping-item">${item}</span>
 				<div class="shopping-item-controls">
 					<button class="shopping-item-toggle">
@@ -32,7 +32,12 @@ function addToList( item ) {
 						<span class="button-label">delete</span>
 					</button>
 				</div>
-			</li>`);
+			</li>`;
+		if ( checkedItems.length != 0 ) {
+			$(checkedItems).eq(0).before(html);
+		} else {
+			$('.shopping-list').append(html);
+		}
 	}
 }
 
@@ -90,7 +95,7 @@ function isChecked( item ) {
 }
 
 /**
- * Finds an item in the list and unchecks it
+ * Finds an item in the list, unchecks it and moves it above the checked items
  * @param {string} item - The item to uncheck
  */
 function unCheck( item ) {
@@ -98,7 +103,48 @@ function unCheck( item ) {
 	if ( match.length === 0 )
 		return;
 	$(match).removeClass('shopping-item__checked');
-	resetCheck(match);
+	$(match).closest('li').find('.shopping-item-toggle .button-label').text('check');
+	let html = $(match).closest('li').html();
+	let checkedItems = getCheckedItems();
+	if ( checkedItems.length != 0 ) {
+		$(match).closest('li').remove();
+		$(checkedItems).eq(0).before(`<li>${html}</li>`);
+	}
+}
+
+/**
+ * Finds an item in the list, checks it and moves it to the bottom of the list
+ * @param {string} item - The item to uncheck
+ */
+function check( item ) {
+	let match = getItem( item );
+	$(match).addClass('shopping-item__checked');
+	$(match).closest('li').find('.shopping-item-toggle .button-label').text('uncheck');
+	const html = $(match).closest('li').html();
+	$(match).closest('li').remove();
+	$('.shopping-list').append(`<li>${html}</li>`);
+}
+
+/**
+ * Toggle whether an item is checked or not
+ * @param {string} item - the item for which to toggle whether it is checked or not
+ */
+function toggleChecked( item ) {
+	if ( isChecked( item ) ) {
+		unCheck( item );
+	} else {
+		check( item );
+	}
+}
+
+/**
+ * Get an array of the checked items on the list
+ * @return An array of the checked elements on the list
+ */
+function getCheckedItems() {
+	return $('.shopping-list').find('li').filter(function(idx, elem) {
+		return $(elem).find('.shopping-item').attr('class').split(/\s+/).includes('shopping-item__checked');
+	});
 }
 
 /**
@@ -131,11 +177,12 @@ $( function () {
 		event.stopPropagation();
 		 // Each shopping list item is a <li>. Go up the DOM tree to the <li> element, 
 		 // then back down to find the item text itself.
-		let itemText = $(this).closest('li').find('.shopping-item');
+		let item = $(this).closest('li').find('.shopping-item').text();
 		// Toggle whether the text is struck through or not
-		itemText.toggleClass('shopping-item__checked');
+		// itemText.toggleClass('shopping-item__checked');
+		toggleChecked( item );
 		// Set the text on the check button based on the item's state
-		resetCheck(itemText);
+		// resetCheck(itemText);
 	})
 })
 
@@ -156,16 +203,17 @@ $( function () {
  */
 function resetCheck( items=[] ) {
 	// If we don't pass it a list of items to check, check all the items in the list
-	if ( items.length === 0 )
-		items = $('.shopping-list').find('.shopping-item');
-	$(items).each( function() {
-		console.log( $(this).attr('class'));
-		// If the item is checked off, change the button text to indicate the proper action of uncheck
-		if ( $(this).attr('class').split(/\s+/).includes('shopping-item__checked') )
-			$(this).closest('li').find('.shopping-item-toggle .button-label').text('uncheck');
-		// If the item is not checked off (or has been unchecked), change the button text to indicate the proper action of check
-		else
-			$(this).closest('li').find('.shopping-item-toggle .button-label').text('check');
+	if ( items.length === 0 ) {
+		$('.shopping-list').find('.shopping-item').each( function () {
+			items.push( $(this).text());
+		});
+	}
+	items.forEach( function( item ) {
+		if ( isChecked( item ) ) {
+			check( item );
+		} else {
+			unCheck( item );
+		}
 	});
 }
 
