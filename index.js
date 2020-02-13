@@ -30,7 +30,7 @@ $( function() {
 
 		// Get the text of what the user wants to add to the list:
 		let inputField = $(this).find('input[name="shopping-list-entry"]');
-		let item = inputField.val();
+		let item = inputField.val().trim();
 		console.log(item);
 		// Add it to the list
 		addToList( item );
