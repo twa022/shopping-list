@@ -102,6 +102,7 @@ function unCheck( item ) {
 	let html = $(match).closest('li').html();
 	$(match).closest('li').remove();
 	$('.shopping-list-unchecked').append(`<li>${html}</li>`);
+	toggleHideChecked();
 }
 
 /**
@@ -115,6 +116,14 @@ function check( item ) {
 	let html = $(match).closest('li').html();
 	$(match).closest('li').remove();
 	$('.shopping-list-checked').append(`<li>${html}</li>`);
+	toggleHideChecked();
+}
+
+function toggleHideChecked() {
+	if ( getCheckedItems().length === 0 )
+		$('.hide-checked-toggle').attr('hidden', true);
+	else
+		$('.hide-checked-toggle').attr('hidden', false);
 }
 
 /**
@@ -201,6 +210,23 @@ $( function () {
 	})
 })
 
+$( function () {
+	$('.btn-hide-checked-toggle').click( function( event ) {
+		removeWarning();
+		event.stopPropagation();
+		$('.shopping-list-checked').attr('hidden', function(_, attr){ return !attr});
+		// TODO: use something from FontAwesome to give better looking arrows.
+		if ( $('.lbl-hide-checked-toggle').text() === "Hide Checked Items" ) {
+			$('.lbl-hide-checked-toggle').text("Show Checked Items");
+			$('.lbl-hide-checked-toggle').closest('div').find('button').text(">");
+		} else {
+			$('.lbl-hide-checked-toggle').text("Hide Checked Items");
+			$('.lbl-hide-checked-toggle').closest('div').find('button').text("^");
+		}
+		console.log('clicked the hide checked items button');
+	})
+})
+
 /**
  * Toggle the text on the button to check/uncheck depending on it's state.
  */
@@ -216,6 +242,8 @@ function resetCheck( items=[] ) {
 			check( item );
 		}
 	});
+	if ( getCheckedItems().length === 0 )
+		$('.hide-checked-toggle').attr(hidden);
 }
 
 /**
@@ -224,7 +252,13 @@ function resetCheck( items=[] ) {
  */
 function addCheckedItemList() {
 	$('.shopping-list').addClass('shopping-list-unchecked');
-	$('.shopping-list').after('<ul class="shopping-list shopping-list-checked"></ul>');
+	let html = `
+		<div class="hide-checked-toggle">
+			<button id='btn-hide-checked-toggle' class='btn-hide-checked-toggle'>^</button>
+			<label for='btn-hide-checked-toggle' class='lbl-hide-checked-toggle'>Hide Checked Items</label>
+		</div>
+		<ul class="shopping-list shopping-list-checked"></ul>`;
+	$('.shopping-list').after(`${html}`);
 	console.log($('.shopping-list-checked').length);
 	console.log($('.shopping-list-checked').html());
 }
