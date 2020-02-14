@@ -179,10 +179,7 @@ $( function () {
 		 // then back down to find the item text itself.
 		let item = $(this).closest('li').find('.shopping-item').text();
 		// Toggle whether the text is struck through or not
-		// itemText.toggleClass('shopping-item__checked');
 		toggleChecked( item );
-		// Set the text on the check button based on the item's state
-		// resetCheck(itemText);
 	})
 })
 
