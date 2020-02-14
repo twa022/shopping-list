@@ -21,8 +21,7 @@ function addToList( item ) {
 		}
 	// Otherwise, the item isn't on the list, so add it
 	} else {
-		let checkedItems = getCheckedItems();
-		let html = `<li>
+		$('.shopping-list-unchecked').append(`<li>
 				<span class="shopping-item">${item}</span>
 				<div class="shopping-item-controls">
 					<button class="shopping-item-toggle">
@@ -32,12 +31,8 @@ function addToList( item ) {
 						<span class="button-label">delete</span>
 					</button>
 				</div>
-			</li>`;
-		if ( checkedItems.length != 0 ) {
-			$(checkedItems).eq(0).before(html);
-		} else {
-			$('.shopping-list').append(html);
-		}
+			</li>`
+		);
 	}
 }
 
@@ -105,11 +100,8 @@ function unCheck( item ) {
 	$(match).removeClass('shopping-item__checked');
 	$(match).closest('li').find('.shopping-item-toggle .button-label').text('check');
 	let html = $(match).closest('li').html();
-	let checkedItems = getCheckedItems();
-	if ( checkedItems.length != 0 ) {
-		$(match).closest('li').remove();
-		$(checkedItems).eq(0).before(`<li>${html}</li>`);
-	}
+	$(match).closest('li').remove();
+	$('.shopping-list-unchecked').append(`<li>${html}</li>`);
 }
 
 /**
@@ -120,9 +112,9 @@ function check( item ) {
 	let match = getItem( item );
 	$(match).addClass('shopping-item__checked');
 	$(match).closest('li').find('.shopping-item-toggle .button-label').text('uncheck');
-	const html = $(match).closest('li').html();
+	let html = $(match).closest('li').html();
 	$(match).closest('li').remove();
-	$('.shopping-list').append(`<li>${html}</li>`);
+	$('.shopping-list-checked').append(`<li>${html}</li>`);
 }
 
 /**
@@ -142,9 +134,23 @@ function toggleChecked( item ) {
  * @return An array of the checked elements on the list
  */
 function getCheckedItems() {
-	return $('.shopping-list').find('li').filter(function(idx, elem) {
-		return $(elem).find('.shopping-item').attr('class').split(/\s+/).includes('shopping-item__checked');
-	});
+	return $('.shopping-list-checked').find('li');
+}
+
+/**
+ * Get an array of the unchecked items on the list
+ * @return An array of the unchecked elements on the list
+ */
+function getUnCheckedItems() {
+	return $('.shopping-list-unchecked').find('li');
+}
+
+/**
+ * Get an array of all the items on the list
+ * @return An array of the the items on the list (checked or unchecked)
+ */
+function getAllItems() {
+	return $('.shopping-list').find('li');
 }
 
 /**
@@ -172,7 +178,7 @@ $( function() {
  * Listener on the check buttons on each list item
  */
 $( function () {
-	$('.shopping-list').on('click', 'button[class="shopping-item-toggle"]',  function( event ) {
+	$('.shopping-list').on('click', 'button[class="shopping-item-toggle"]', function(event) {
 		removeWarning();
 		event.stopPropagation();
 		 // Each shopping list item is a <li>. Go up the DOM tree to the <li> element, 
@@ -208,10 +214,21 @@ function resetCheck( items=[] ) {
 	items.forEach( function( item ) {
 		if ( isChecked( item ) ) {
 			check( item );
-		} else {
-			unCheck( item );
 		}
 	});
 }
 
+/**
+ * Repurpose the existing shopping-list as a list for unchecked items
+ * Add a list for checked items after it.
+ */
+function addCheckedItemList() {
+	$('.shopping-list').addClass('shopping-list-unchecked');
+	$('.shopping-list').after('<ul class="shopping-list shopping-list-checked"></ul>');
+	console.log($('.shopping-list-checked').length);
+	console.log($('.shopping-list-checked').html());
+}
+
+// Functions to affect / reconfigure the webpage before any user interaction.
+addCheckedItemList();
 resetCheck();
