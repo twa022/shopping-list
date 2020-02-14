@@ -115,7 +115,7 @@ function check( item ) {
 	$(match).closest('li').find('.shopping-item-toggle .button-label').text('uncheck');
 	let html = $(match).closest('li').html();
 	$(match).closest('li').remove();
-	$('.shopping-list-checked').append(`<li>${html}</li>`);
+	$('.shopping-list-checked').append(`<li style="background-image:radial-gradient(at 20% 20%, #b2b2b2, #ffffff);">${html}</li>`);
 	toggleHideChecked();
 }
 
@@ -254,7 +254,7 @@ function addCheckedItemList() {
 	$('.shopping-list').addClass('shopping-list-unchecked');
 	let html = `
 		<div class="hide-checked-toggle">
-			<button id='btn-hide-checked-toggle' class='btn-hide-checked-toggle'>^</button>
+			<button id='btn-hide-checked-toggle' class='btn-hide-checked-toggle' style='background-color:white;border:0px'>^</button>
 			<label for='btn-hide-checked-toggle' class='lbl-hide-checked-toggle'>Hide Checked Items</label>
 		</div>
 		<ul class="shopping-list shopping-list-checked"></ul>`;
