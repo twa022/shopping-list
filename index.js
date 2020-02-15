@@ -84,6 +84,10 @@ function removeWarning() {
 	$('.warning').remove();
 }
 
+function focusEntry() {
+	document.getElementById('shopping-list-entry').focus();
+}
+
 /**
  * Returns whether or not an item is in the list already
  * @param {string} item - The item to find on the list
@@ -210,6 +214,7 @@ $( function() {
 		addToList( item );
 		// Reset the field so it doesn't still contain the text of what we just added
 		inputField.val('');
+		focusEntry();
 	});
 })
 
@@ -225,6 +230,7 @@ $( function () {
 		let item = $(this).closest('li').find('.shopping-item').text();
 		// Toggle whether the text is struck through or not
 		toggleChecked( item );
+		focusEntry();
 	});
 })
 
@@ -237,6 +243,7 @@ $( function () {
 		event.stopPropagation();
 		 // Each shopping list item is a <li>. Go up the DOM tree to the <li> element, and remove it 
 		 $(this).closest('li').remove();
+		 focusEntry();
 	});
 })
 
@@ -254,6 +261,7 @@ $( function () {
 			$('.lbl-hide-checked-toggle').closest('div').find('button').text("^");
 		}
 		console.log('clicked the hide checked items button');
+		focusEntry();
 	});
 })
 
@@ -281,7 +289,6 @@ function resetList() {
 		check( item );
 	});
 	toggleHideChecked();
-	
 }
 
 /**
@@ -303,3 +310,4 @@ function addCheckedItemList() {
 // Functions to affect / reconfigure the webpage before any user interaction.
 addCheckedItemList();
 resetList();
+focusEntry();
