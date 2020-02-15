@@ -16,11 +16,7 @@ function addToList( item, checked = false ) {
 			addWarning(`<span style="color:red">${item}</span> ${( item[item.length - 1] === 's') ? 'are' : 'is'} already on the list`);
 		// If the item is on the list and checked: uncheck it and display a message letting the user know that's what you did
 		} else {
-			$('.shopping-list').find('.shopping-item').filter(function(idx, elem) {
-				return $(elem).text().toLowerCase() === item;
-			}).closest('li').remove();
-			addToList( item );
-//			unCheck( item );
+			unCheck( item );
 			addWarning(`Unchecked <span style="color:red">${item}</span>`);
 		}
 	// Otherwise, the item isn't on the list, so add it
@@ -152,6 +148,7 @@ function check( item ) {
 }
 
 function toggleHideChecked() {
+	console.log(getCheckedItems().length);
 	if ( getCheckedItems().length === 0 ) {
 		$('.hide-checked-toggle').attr('hidden', true);
 	} else {
