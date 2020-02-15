@@ -115,6 +115,7 @@ function check( item ) {
 	$(match).closest('li').find('.shopping-item-toggle .button-label').text('uncheck');
 	let html = $(match).closest('li').html();
 	$(match).closest('li').remove();
+	// Add styling to the checked items. Since when we add an item we add the surrounding <li>'s, when we add an item it'
 	$('.shopping-list-checked').append(`<li style="background-image:radial-gradient(at 20% 20%, #b2b2b2, #ffffff);">${html}</li>`);
 	toggleHideChecked();
 }
