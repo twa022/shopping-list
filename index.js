@@ -38,14 +38,15 @@ function addToList( item, checked = false ) {
 					</button>
 				</div>
 			</li>
-		`
+		`;
 		insertBeforeIdx = getInsertIndex( item, checked );
 
 		if ( insertBeforeIdx === $(list).length || $(list).length === 0 ) {
-			if ( checked )
+			if ( checked ) {
 				$('.shopping-list-checked').append(`${html}`);
-			else
+			} else {
 				$('.shopping-list-unchecked').append(`${html}`);
+			}
 		} else {
 			$(list).eq(insertBeforeIdx).before(`${html}`);
 		}
@@ -74,9 +75,10 @@ function getInsertIndex( newItem, checked = false ) {
  */
 function addWarning(htmlString) {
 	$('#js-shopping-list-form').after(`
-	<p class="warning" style="border:red solid 2px;padding:20px;font-style:italic;text-align:center">
-		{ ${htmlString} }
-	</p>`);
+		<p class="warning" style="border:red solid 2px;padding:20px;font-style:italic;text-align:center">
+			{ ${htmlString} }
+		</p>
+	`);
 }
 
 /**
@@ -116,8 +118,7 @@ function getItem( item ) {
  */
 function isChecked( item ) {
 	let match = getItem( item );
-	if ( match.length === 0 )
-		return false;
+	if ( match.length === 0 ) return false;
 	return $(match).attr('class').split(/\s+/).includes('shopping-item__checked');
 }
 
@@ -151,10 +152,11 @@ function check( item ) {
 }
 
 function toggleHideChecked() {
-	if ( getCheckedItems().length === 0 )
+	if ( getCheckedItems().length === 0 ) {
 		$('.hide-checked-toggle').attr('hidden', true);
-	else
+	} else {
 		$('.hide-checked-toggle').attr('hidden', false);
+	}
 }
 
 /**
@@ -211,7 +213,7 @@ $( function() {
 		addToList( item );
 		// Reset the field so it doesn't still contain the text of what we just added
 		inputField.val('');
-	})
+	});
 })
 
 /**
@@ -226,7 +228,7 @@ $( function () {
 		let item = $(this).closest('li').find('.shopping-item').text();
 		// Toggle whether the text is struck through or not
 		toggleChecked( item );
-	})
+	});
 })
 
 /**
@@ -238,7 +240,7 @@ $( function () {
 		event.stopPropagation();
 		 // Each shopping list item is a <li>. Go up the DOM tree to the <li> element, and remove it 
 		 $(this).closest('li').remove();
-	})
+	});
 })
 
 $( function () {
@@ -255,7 +257,7 @@ $( function () {
 			$('.lbl-hide-checked-toggle').closest('div').find('button').text("^");
 		}
 		console.log('clicked the hide checked items button');
-	})
+	});
 })
 
 /**
@@ -274,7 +276,6 @@ function resetList() {
 		$(this).closest('li').remove();
 	});
 	// Add all the items to the list unchecked
-	console.log(checkedItems)
 	items.forEach( function( item ) {
 		addToList( item );
 	});
@@ -297,10 +298,9 @@ function addCheckedItemList() {
 			<button id='btn-hide-checked-toggle' class='btn-hide-checked-toggle' style='background-color:white;border:0px'>^</button>
 			<label for='btn-hide-checked-toggle' class='lbl-hide-checked-toggle'>Hide Checked Items</label>
 		</div>
-		<ul class="shopping-list shopping-list-checked"></ul>`;
+		<ul class="shopping-list shopping-list-checked"></ul>
+	`;
 	$('.shopping-list').after(`${html}`);
-	console.log($('.shopping-list-checked').length);
-	console.log($('.shopping-list-checked').html());
 }
 
 // Functions to affect / reconfigure the webpage before any user interaction.
