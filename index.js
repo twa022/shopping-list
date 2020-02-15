@@ -5,7 +5,7 @@
  * If the item is on the list: display a warning
  * @param {string} item - An item to add to the list.
  */
-function addToList( item ) {
+function addToList( item, checked = false ) {
 	item = item.trim();
 	// If it's an empty string, display an error message
 	if ( item.length === 0 ) { 
@@ -16,12 +16,18 @@ function addToList( item ) {
 			addWarning(`<span style="color:red">${item}</span> ${( item[item.length - 1] === 's') ? 'are' : 'is'} already on the list`);
 		// If the item is on the list and checked: uncheck it and display a message letting the user know that's what you did
 		} else {
-			unCheck( item );
+			$('.shopping-list').find('.shopping-item').filter(function(idx, elem) {
+				return $(elem).text().toLowerCase() === item;
+			}).closest('li').remove();
+			addToList( item );
+//			unCheck( item );
 			addWarning(`Unchecked <span style="color:red">${item}</span>`);
 		}
 	// Otherwise, the item isn't on the list, so add it
 	} else {
-		$('.shopping-list-unchecked').append(`<li>
+		let list = ( checked ) ? getCheckedItems() : getUnCheckedItems();
+		let html = `
+			<li>
 				<span class="shopping-item">${item}</span>
 				<div class="shopping-item-controls">
 					<button class="shopping-item-toggle">
@@ -31,9 +37,35 @@ function addToList( item ) {
 						<span class="button-label">delete</span>
 					</button>
 				</div>
-			</li>`
-		);
+			</li>
+		`
+		insertBeforeIdx = getInsertIndex( item, checked );
+
+		if ( insertBeforeIdx === $(list).length || $(list).length === 0 ) {
+			if ( checked )
+				$('.shopping-list-checked').append(`${html}`);
+			else
+				$('.shopping-list-unchecked').append(`${html}`);
+		} else {
+			$(list).eq(insertBeforeIdx).before(`${html}`);
+		}
 	}
+}
+
+function getInsertIndex( newItem, checked = false ) {
+	let items = [];
+	let idx = 0;
+	let list = ( checked ) ? getCheckedItems() : getUnCheckedItems();
+	$(list).each(function() { 
+		items.push($(this).find('.shopping-item').text());
+	});
+	items.some(function( item ) {
+		if ( item.localeCompare( newItem ) > 0 ) 
+			return true;
+		idx++;
+		return false;
+	});
+	return idx;
 }
 
 /**
@@ -95,13 +127,9 @@ function isChecked( item ) {
  */
 function unCheck( item ) {
 	let match = getItem( item );
-	if ( match.length === 0 )
-		return;
-	$(match).removeClass('shopping-item__checked');
-	$(match).closest('li').find('.shopping-item-toggle .button-label').text('check');
-	let html = $(match).closest('li').html();
+	if ( match.length === 0 ) return;
 	$(match).closest('li').remove();
-	$('.shopping-list-unchecked').append(`<li>${html}</li>`);
+	addToList( item );
 	toggleHideChecked();
 }
 
@@ -111,12 +139,14 @@ function unCheck( item ) {
  */
 function check( item ) {
 	let match = getItem( item );
+	if ( match.length === 0 ) return;
+	$(match).closest('li').remove();
+	addToList(item, true);
+	match = getItem( item );
+	// Add styling to the checked items.
 	$(match).addClass('shopping-item__checked');
 	$(match).closest('li').find('.shopping-item-toggle .button-label').text('uncheck');
-	let html = $(match).closest('li').html();
-	$(match).closest('li').remove();
-	// Add styling to the checked items. Since when we add an item we add the surrounding <li>'s, when we add an item it'
-	$('.shopping-list-checked').append(`<li style="background-image:radial-gradient(at 20% 20%, #b2b2b2, #ffffff);">${html}</li>`);
+	$(match).closest('li').attr("style", "background-image:radial-gradient(at 20% 20%, #b2b2b2, #ffffff)");
 	toggleHideChecked();
 }
 
@@ -229,22 +259,31 @@ $( function () {
 })
 
 /**
- * Toggle the text on the button to check/uncheck depending on it's state.
+ * Reset the initial list to it's correct state
  */
-function resetCheck( items=[] ) {
+function resetList() {
 	// If we don't pass it a list of items to check, check all the items in the list
-	if ( items.length === 0 ) {
-		$('.shopping-list').find('.shopping-item').each( function () {
-			items.push( $(this).text());
-		});
-	}
-	items.forEach( function( item ) {
-		if ( isChecked( item ) ) {
-			check( item );
-		}
+	let items = [];
+	let checkedItems = [];
+	// Make a list of all the items and a list of the checked items
+	$('.shopping-list').find('.shopping-item').each( function () {
+		let item = $(this).text();
+		if ( isChecked( item ) )
+			checkedItems.push( item );
+		items.push( item );
+		$(this).closest('li').remove();
 	});
-	if ( getCheckedItems().length === 0 )
-		$('.hide-checked-toggle').attr(hidden);
+	// Add all the items to the list unchecked
+	console.log(checkedItems)
+	items.forEach( function( item ) {
+		addToList( item );
+	});
+	// Check the checked off items (moving them to the checked list)
+	checkedItems.forEach( function( item ) {
+		check( item );
+	});
+	toggleHideChecked();
+	
 }
 
 /**
@@ -266,4 +305,4 @@ function addCheckedItemList() {
 
 // Functions to affect / reconfigure the webpage before any user interaction.
 addCheckedItemList();
-resetCheck();
+resetList();
