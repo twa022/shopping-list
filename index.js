@@ -4,7 +4,7 @@
  * If the item is on the list and checked off: uncheck it and display a message
  * If the item is on the list: display a warning
  * @param {string} item - An item to add to the list.
- */
+ */	
 function addToList( item, checked = false ) {
 	item = item.trim();
 	// If it's an empty string, display an error message
@@ -23,14 +23,20 @@ function addToList( item, checked = false ) {
 	} else {
 		let list = ( checked ) ? getCheckedItems() : getUnCheckedItems();
 		let html = `
-			<li>
-				<span class="shopping-item">${item}</span>
-				<div class="shopping-item-controls">
-					<button class="shopping-item-toggle">
-						<span class="button-label">check</span>
+			<li style="position:relative; border-radius:5px;padding:10px;">
+				<button class="shopping-item-toggle" style="border: 0px;background-color:unset">
+					<i class="far fa-square"></i>
+				</button>
+				<span class="shopping-item" style="display:inline;margin-bottom:0;margin-left:10px;">${item}</span>
+				<div style="display:inline-block;position:absolute;right:0px;text-align:right;margin-right:20px;margin-top:0;margin-bottom:0;">
+					<div style="display:inline-block" hidden class="categories">
+					</div>
+					<button class="add-category" style="border:2px #569CB9 solid; border-radius: 40px; background-color:lightgrey;padding-left:7px;padding-right:7px;padding-top:0px;padding-bottom:0px;">
+						<i class="fas fa-plus-circle" style="font-size:0.8rem;margin-top:4px;margin-bottom:4px;margin-right: 4px;"></i>
+						<span style="font-size:0.8rem;margin-top:4px;margin-bottom:4px;">Category</span>
 					</button>
-					<button class="shopping-item-delete">
-						<span class="button-label">delete</span>
+					<button class="shopping-item-delete" style="position:static;border: 0px;background-color:unset;color:red;">
+						<i class="far fa-trash-alt"></i>
 					</button>
 				</div>
 			</li>
@@ -71,7 +77,7 @@ function getInsertIndex( newItem, checked = false ) {
  */
 function addWarning(htmlString) {
 	$('#js-shopping-list-form').after(`
-		<p class="warning" style="border:red solid 2px;padding:20px;font-style:italic;text-align:center">
+		<p class="warning" style="border:red solid 2px;padding:10px;font-style:italic;text-align:center; border-radius:5px;">
 			{ ${htmlString} }
 		</p>
 	`);
@@ -146,8 +152,9 @@ function check( item ) {
 	match = getItem( item );
 	// Add styling to the checked items.
 	$(match).addClass('shopping-item__checked');
-	$(match).closest('li').find('.shopping-item-toggle .button-label').text('uncheck');
-	$(match).closest('li').attr("style", "background-image:radial-gradient(at 20% 20%, #b2b2b2, #ffffff)");
+	$(match).closest('li').find('.shopping-item-toggle').find('i').remove(); // .button-label').text('uncheck');
+	$(match).closest('li').find('.shopping-item-toggle').append(`<i class="far fa-check-square"></i>`);
+	$(match).closest('li').attr("style", "position:relative;border-radius:5px;padding:10px;background-image:radial-gradient(at 20% 20%, #b2b2b2, #ffffff)");
 	toggleHideChecked();
 }
 
@@ -243,6 +250,7 @@ $( function () {
 		event.stopPropagation();
 		 // Each shopping list item is a <li>. Go up the DOM tree to the <li> element, and remove it 
 		 $(this).closest('li').remove();
+		 toggleHideChecked();
 		 focusEntry();
 	});
 })
@@ -252,13 +260,14 @@ $( function () {
 		removeWarning();
 		event.stopPropagation();
 		$('.shopping-list-checked').attr('hidden', function(_, attr){ return !attr});
-		// TODO: use something from FontAwesome to give better looking arrows.
 		if ( $('.lbl-hide-checked-toggle').text() === "Hide Checked Items" ) {
 			$('.lbl-hide-checked-toggle').text("Show Checked Items");
-			$('.lbl-hide-checked-toggle').closest('div').find('button').text(">");
+			$('.lbl-hide-checked-toggle').closest('div').find('button').find('i').remove();
+			$('.lbl-hide-checked-toggle').closest('div').find('button').append(`<i class="fas fa-angle-right">`);
 		} else {
 			$('.lbl-hide-checked-toggle').text("Hide Checked Items");
-			$('.lbl-hide-checked-toggle').closest('div').find('button').text("^");
+			$('.lbl-hide-checked-toggle').closest('div').find('button').find('i').remove();
+			$('.lbl-hide-checked-toggle').closest('div').find('button').append(`<i class="fas fa-angle-down">`);
 		}
 		console.log('clicked the hide checked items button');
 		focusEntry();
@@ -299,7 +308,7 @@ function addCheckedItemList() {
 	$('.shopping-list').addClass('shopping-list-unchecked');
 	let html = `
 		<div class="hide-checked-toggle">
-			<button id='btn-hide-checked-toggle' class='btn-hide-checked-toggle' style='background-color:white;border:0px'>^</button>
+			<button id='btn-hide-checked-toggle' class='btn-hide-checked-toggle' style='background-color:white;border:0px'><i class="fas fa-angle-down"></i></button>
 			<label for='btn-hide-checked-toggle' class='lbl-hide-checked-toggle'>Hide Checked Items</label>
 		</div>
 		<ul class="shopping-list shopping-list-checked"></ul>
@@ -307,7 +316,33 @@ function addCheckedItemList() {
 	$('.shopping-list').after(`${html}`);
 }
 
+function addFontAwesomeImport() {
+	$('head').append(`
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
+	crossorigin="anonymous">`);
+}
+
+function restyleCheckButton() {
+	$('.shopping-item-toggle').children().remove();
+	$('.shopping-item-toggle').append(`<i class="far fa-square"></i>`);
+}
+
+function restyleAddItemButton() {
+	let btn = $('#js-shopping-list-form').find('button[type="submit"]');
+	$(btn).text('');
+	$(btn).append(`<i class="far fa-plus-square"></i>`);
+	$(btn).attr("style", "border:#569CB9 2px solid; background-color:unset; border-radius: 4px; margin-left: 6px;")
+}
+
+function changeAddLabel() {
+	$('#js-shopping-list-form').find('label').text('Add: ');
+}
+
 // Functions to affect / reconfigure the webpage before any user interaction.
+addFontAwesomeImport();
+changeAddLabel();
+restyleCheckButton();
+restyleAddItemButton();
 addCheckedItemList();
 resetList();
 focusEntry();
