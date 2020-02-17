@@ -255,6 +255,9 @@ $( function () {
 	});
 })
 
+/**
+ * Listener on the add category button on each item
+ */
 $( function() {
 	$('.shopping-list').on('click', 'button[class="add-category"]', function( event ) {
 		removeWarning();
@@ -266,11 +269,16 @@ $( function() {
 				<button type="submit"><i class="fas fa-plus-circle" style="background-color:unset"></i></button>
 			</form>
 		`);
+		// Focus on the entry field that we just created
 		$('#add-category-form').find('input').focus();
+		// Hide the add category button while the user is in the process of already adding a category
 		$(this).attr('hidden', true);
 	});
 })
 
+/**
+ * Listener on the button to toggle hiding the checked items
+ */
 $( function () {
 	$('.btn-hide-checked-toggle').click( function( event ) {
 		removeWarning();
@@ -290,6 +298,10 @@ $( function () {
 	});
 })
 
+/**
+ * Listener on the add category field.
+ * When clicking out of the field, delete the form and show the add category button again
+ */
 $( function() {
 	$('.shopping-list').on('focusout', '.add-category-form', function( event ) {
 		$(this).parent().find('button[class="add-category"]').attr('hidden', false);
@@ -297,6 +309,10 @@ $( function() {
 	});
 })
 
+/**
+ * Listener on the add category field when submitted
+ * Add a category with the specified name or change the category if the item already has a category
+ */
 $( function() {
 	$('.shopping-list').on('submit', '.add-category-form', function( event ) {
 		event.preventDefault();
@@ -315,8 +331,17 @@ $( function() {
 		} else {
 			$(this).parent().find('.category span').text(`${value}`);
 		}
+		// Unhide the add category button
 		$(this).parent().find('button[class="add-category"]').attr('hidden', false);
+		// Remove the category entry field now that we're done.
 		$(this).remove();
+	});
+})
+
+$( function() {
+	$('.shopping-list').on('click', '.remove-category', function( event )  {
+		$(this).parent('.category').remove();
+		// Remove the category
 	});
 })
 
