@@ -255,6 +255,22 @@ $( function () {
 	});
 })
 
+$( function() {
+	$('.shopping-list').on('click', 'button[class="add-category"]', function( event ) {
+		removeWarning();
+		// Change the button to a similarly styled entry field
+		$(this).after(`
+			<form id="add-category-form" class="add-category-form" style="display:inline-block;border:2px #569CB9 solid; border-radius: 40px; background-color:lightgrey;padding-left:7px;padding-right:7px;padding-top:0px;padding-bottom:0px;">
+				<label for="add-category-field" hidden>New Category Name</label>
+				<input type="text" name="add-category-field" placeholder="Category" style="background-color:unset;font-size:0.8rem;margin:0px;border:0px;border-radius:10px;>
+				<button type="submit"><i class="fas fa-plus-circle" style="background-color:unset"></i></button>
+			</form>
+		`);
+		$('#add-category-form').find('input').focus();
+		$(this).attr('hidden', true);
+	});
+})
+
 $( function () {
 	$('.btn-hide-checked-toggle').click( function( event ) {
 		removeWarning();
@@ -271,6 +287,36 @@ $( function () {
 		}
 		console.log('clicked the hide checked items button');
 		focusEntry();
+	});
+})
+
+$( function() {
+	$('.shopping-list').on('focusout', '.add-category-form', function( event ) {
+		$(this).parent().find('button[class="add-category"]').attr('hidden', false);
+		$(this).remove();
+	});
+})
+
+$( function() {
+	$('.shopping-list').on('submit', '.add-category-form', function( event ) {
+		event.preventDefault();
+		event.stopPropagation();
+		console.log(this);
+		let inputField = $(this).find('input');
+		let value = $(inputField).val().trim();
+		console.log(value);
+		// Each item can only have one category (for now)
+		if ( $(this).parent().find('.category').length === 0 ) {
+			$(this).parent().find('button[class="add-category"]').before(`
+				<div class="category" style="display:inline-block;border:2px #569CB9 solid; border-radius: 40px; background-color:lightgrey;padding-left:7px;padding-right:7px;font-size:0.8rem;">
+					<span style="margin-right:6px;">${value}</span><button class="remove-category" style="border:0px;background-color:unset;margin:0"><i class="fas fa-times-circle"></i></button>
+				</div>
+			`);
+		} else {
+			$(this).parent().find('.category span').text(`${value}`);
+		}
+		$(this).parent().find('button[class="add-category"]').attr('hidden', false);
+		$(this).remove();
 	});
 })
 
