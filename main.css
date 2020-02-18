@@ -6,7 +6,7 @@ body {
 	font-family: 'Roboto', sans-serif;
 }
 
-button, input[type="text"] {
+#js-shopping-list-form button, input[type="text"] {
 	padding: 5px;
 }
 
@@ -44,4 +44,11 @@ button:hover {
 
 .shopping-item__checked {
 	text-decoration: line-through;
+}
+
+#js-shopping-list-form button[type="submit"] {
+	border:#569CB9 2px solid;
+	background-color:unset;
+	border-radius: 4px;
+	margin-left: 6px;
 }

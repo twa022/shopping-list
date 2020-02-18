@@ -47,10 +47,12 @@ function addToList( item, checked = false, category = null ) {
 			</li>
 		`;
 		insertBeforeIdx = getInsertIndex( item, checked );
+		console.log(insertBeforeIdx);
 
 		if ( insertBeforeIdx === $(list).length || $(list).length === 0 ) {
 			if ( checked ) {
 				$('.shopping-list-checked').append(`${html}`);
+				styleCheckedItem(item);
 			} else {
 				$('.shopping-list-unchecked').append(`${html}`);
 			}
@@ -81,18 +83,16 @@ function getInsertIndex( newItem, checked = false ) {
  * @param {string} htmlString - A string containing the text of the warning (can include html tags)
  */
 function addWarning(htmlString) {
-	$('#js-shopping-list-form').after(`
-		<p class="warning" style="border:red solid 2px;padding:10px;font-style:italic;text-align:center; border-radius:5px;">
-			{ ${htmlString} }
-		</p>
-	`);
+	$('.warning').attr('hidden', false);
+	$('.warning').append( htmlString );
 }
 
 /**
  * Remove any warning messages
  */
 function removeWarning() {
-	$('.warning').remove();
+	$('.warning').attr('hidden', true);
+	$('.warning').children().remove();
 }
 
 function focusEntry() {
@@ -157,13 +157,16 @@ function check( item ) {
 	console.log("categories: " + cat);
 	$(match).closest('li').remove();
 	addToList(item, true, cat );
+	styleCheckedItem(item);
+	toggleHideChecked();
+}
+
+function styleCheckedItem(item) {
 	match = getItem( item );
-	// Add styling to the checked items.
 	$(match).addClass('shopping-item__checked');
 	$(match).closest('li').find('.shopping-item-toggle').find('i').remove(); // .button-label').text('uncheck');
 	$(match).closest('li').find('.shopping-item-toggle').append(`<i class="far fa-check-square"></i>`);
 	$(match).closest('li').attr("style", "position:relative;border-radius:5px;padding:10px;background-image:radial-gradient(at 20% 20%, #b2b2b2, #ffffff)");
-	toggleHideChecked();
 }
 
 function toggleHideChecked() {
@@ -285,7 +288,7 @@ $( function() {
 		$(this).after(`
 			<form id="add-category-form" class="add-category-form" style="display:inline-block;border:2px #569CB9 solid; border-radius: 40px; background-color:lightgrey;padding-left:7px;padding-right:7px;padding-top:0px;padding-bottom:0px;">
 				<label for="add-category-field" hidden>New Category Name</label>
-				<input type="text" name="add-category-field" placeholder="Category" style="background-color:unset;font-size:0.8rem;margin:0px;border:0px;border-radius:10px;>
+				<input type="text" name="add-category-field" placeholder="Category" style="background-color:unset;font-size:0.8rem;margin:0px;border:0px;border-radius:10px;">
 				<button type="submit"><i class="fas fa-plus-circle" style="background-color:unset"></i></button>
 			</form>
 		`);
@@ -326,6 +329,7 @@ $( function() {
 	$('.shopping-list').on('focusout', '.add-category-form', function( event ) {
 		$(this).parent().find('button[class="add-category"]').attr('hidden', false);
 		$(this).remove();
+		focusEntry();
 	});
 })
 
@@ -361,75 +365,9 @@ $( function() {
 	});
 })
 
-/**
- * Reset the initial list to it's correct state
- */
-function resetList() {
-	// If we don't pass it a list of items to check, check all the items in the list
-	let items = [];
-	let checkedItems = [];
-	// Make a list of all the items and a list of the checked items
-	$('.shopping-list').find('.shopping-item').each( function () {
-		let item = $(this).text();
-		if ( isChecked( item ) )
-			checkedItems.push( item );
-		items.push( item );
-		$(this).closest('li').remove();
-	});
-	// Add all the items to the list unchecked
-	items.forEach( function( item ) {
-		addToList( item );
-	});
-	// Check the checked off items (moving them to the checked list)
-	checkedItems.forEach( function( item ) {
-		check( item );
-	});
-	toggleHideChecked();
-}
-
-/**
- * Repurpose the existing shopping-list as a list for unchecked items
- * Add a list for checked items after it.
- */
-function addCheckedItemList() {
-	$('.shopping-list').addClass('shopping-list-unchecked');
-	let html = `
-		<div class="hide-checked-toggle">
-			<button id='btn-hide-checked-toggle' class='btn-hide-checked-toggle' style='background-color:white;border:0px'><i class="fas fa-angle-down"></i></button>
-			<label for='btn-hide-checked-toggle' class='lbl-hide-checked-toggle'>Hide Checked Items</label>
-		</div>
-		<ul class="shopping-list shopping-list-checked"></ul>
-	`;
-	$('.shopping-list').after(`${html}`);
-}
-
-function addFontAwesomeImport() {
-	$('head').append(`
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
-	crossorigin="anonymous">`);
-}
-
-function restyleCheckButton() {
-	$('.shopping-item-toggle').children().remove();
-	$('.shopping-item-toggle').append(`<i class="far fa-square"></i>`);
-}
-
-function restyleAddItemButton() {
-	let btn = $('#js-shopping-list-form').find('button[type="submit"]');
-	$(btn).text('');
-	$(btn).append(`<i class="far fa-plus-square"></i>`);
-	$(btn).attr("style", "border:#569CB9 2px solid; background-color:unset; border-radius: 4px; margin-left: 6px;")
-}
-
-function changeAddLabel() {
-	$('#js-shopping-list-form').find('label').text('Add: ');
-}
-
 // Functions to affect / reconfigure the webpage before any user interaction.
-addFontAwesomeImport();
-changeAddLabel();
-restyleCheckButton();
-restyleAddItemButton();
-addCheckedItemList();
-resetList();
+addToList('apples');
+addToList('oranges');
+addToList('bread');
+addToList('milk', true);
 focusEntry();
