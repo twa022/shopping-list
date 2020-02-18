@@ -5,7 +5,7 @@
  * If the item is on the list: display a warning
  * @param {string} item - An item to add to the list.
  */	
-function addToList( item, checked = false ) {
+function addToList( item, checked = false, category = null ) {
 	item = item.trim();
 	// If it's an empty string, display an error message
 	if ( item.length === 0 ) { 
@@ -21,6 +21,10 @@ function addToList( item, checked = false ) {
 		}
 	// Otherwise, the item isn't on the list, so add it
 	} else {
+		let categoriesHtml = "";
+		if ( category != null && category.trim().length > 0  ) {
+			categoriesHtml = categoryButtonFactory( category );
+		}
 		let list = ( checked ) ? getCheckedItems() : getUnCheckedItems();
 		let html = `
 			<li style="position:relative; border-radius:5px;padding:10px;">
@@ -31,6 +35,7 @@ function addToList( item, checked = false ) {
 				<div style="display:inline-block;position:absolute;right:0px;text-align:right;margin-right:20px;margin-top:0;margin-bottom:0;">
 					<div style="display:inline-block" hidden class="categories">
 					</div>
+					${categoriesHtml}
 					<button class="add-category" style="border:2px #569CB9 solid; border-radius: 40px; background-color:lightgrey;padding-left:7px;padding-right:7px;padding-top:0px;padding-bottom:0px;">
 						<i class="fas fa-plus-circle" style="font-size:0.8rem;margin-top:4px;margin-bottom:4px;margin-right: 4px;"></i>
 						<span style="font-size:0.8rem;margin-top:4px;margin-bottom:4px;">Category</span>
@@ -135,8 +140,9 @@ function isChecked( item ) {
 function unCheck( item ) {
 	let match = getItem( item );
 	if ( match.length === 0 ) return;
+	let cat = getCategories(item);
 	$(match).closest('li').remove();
-	addToList( item );
+	addToList( item, false, cat );
 	toggleHideChecked();
 }
 
@@ -147,8 +153,10 @@ function unCheck( item ) {
 function check( item ) {
 	let match = getItem( item );
 	if ( match.length === 0 ) return;
+	let cat = getCategories(item);
+	console.log("categories: " + cat);
 	$(match).closest('li').remove();
-	addToList(item, true);
+	addToList(item, true, cat );
 	match = getItem( item );
 	// Add styling to the checked items.
 	$(match).addClass('shopping-item__checked');
@@ -201,6 +209,18 @@ function getUnCheckedItems() {
  */
 function getAllItems() {
 	return $('.shopping-list').find('li');
+}
+
+function categoryButtonFactory( category ) {
+	return `
+		<div class="category-container" style="display:inline-block;border:2px #569CB9 solid; border-radius: 40px; background-color:lightgrey;padding-left:7px;padding-right:7px;font-size:0.8rem;">
+			<span class="category" style="margin-right:6px;">${category}</span><button class="remove-category" style="border:0px;background-color:unset;margin:0"><i class="fas fa-times-circle"></i></button>
+		</div>
+	`;
+}
+
+function getCategories( item ) {
+	return getItem(item).closest('li').find('.category').text();
 }
 
 /**
@@ -323,11 +343,7 @@ $( function() {
 		console.log(value);
 		// Each item can only have one category (for now)
 		if ( $(this).parent().find('.category').length === 0 ) {
-			$(this).parent().find('button[class="add-category"]').before(`
-				<div class="category" style="display:inline-block;border:2px #569CB9 solid; border-radius: 40px; background-color:lightgrey;padding-left:7px;padding-right:7px;font-size:0.8rem;">
-					<span style="margin-right:6px;">${value}</span><button class="remove-category" style="border:0px;background-color:unset;margin:0"><i class="fas fa-times-circle"></i></button>
-				</div>
-			`);
+			$(this).parent().find('button[class="add-category"]').before(categoryButtonFactory(value));
 		} else {
 			$(this).parent().find('.category span').text(`${value}`);
 		}
@@ -340,7 +356,7 @@ $( function() {
 
 $( function() {
 	$('.shopping-list').on('click', '.remove-category', function( event )  {
-		$(this).parent('.category').remove();
+		$(this).parent('.category-container').remove();
 		// Remove the category
 	});
 })
